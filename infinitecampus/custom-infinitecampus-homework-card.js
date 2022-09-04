@@ -66,6 +66,7 @@ class InfiniteCampusStudent extends LitElement {
       modal.assigneddate = e.detail.e.assigneddate;
       modal.duedate = e.detail.e.duedate;
       modal.missing = e.detail.e.missing == true ? e.detail.e.missing : false;
+      modal.date = new Date().toLocaleDateString('en-CA');
     })
   }
 
@@ -96,8 +97,8 @@ class InfiniteCampusStudent extends LitElement {
                     `
                     ${assignment.personid == student.personid && assignment.coursename == course.coursename ? html
                         `
-                        <mwc-list-item hasmeta @click="${() => this._handleClick(assignment)}">
-                            <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span style='color:#a3262c'>missing</span>" : ""}</span>
+                        <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment)}">
+                            <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
                             ${new Date(Date.parse(assignment.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
                         </mwc-list-item>
                         `
@@ -140,6 +141,9 @@ class InfiniteCampusStudent extends LitElement {
         }
         .missing {
           color: #a3262c;
+        }
+        .mwc-compact{
+          height: 24px !important
         }
       </style>
     `;
@@ -259,6 +263,9 @@ class AssignmentDialog extends LitElement{
       .assignment-style {
         color: #3D95EC;
       }
+      .assignment-due {
+        color: #F1D019
+      }
     </style>
     `;
   }
@@ -276,7 +283,7 @@ class AssignmentDialog extends LitElement{
               ${this.missing ? "<mwc-list-item style='color:#a3262c;'><ha-icon icon='mdi:alert-box'></ha-icon>MISSING</mwc-list-item>" : ""}
               <mwc-list-item><ha-icon icon="mdi:counter"></ha-icon><span class="assignment-style">&ensp;Points: </span>${this.totalpoints}</mwc-list-item>
               <mwc-list-item><ha-icon icon="mdi:calendar"></ha-icon><span class="assignment-style">&ensp;Assigned On: </span>${new Date(Date.parse(this.assigneddate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })}</mwc-list-item>
-              <mwc-list-item><ha-icon icon="mdi:calendar-alert"></ha-icon><span class="assignment-style">&ensp;Due On: </span>${new Date(Date.parse(this.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })}</mwc-list-item>
+              <mwc-list-item>${new Date(Date.parse(this.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<ha-icon icon='mdi:calendar-alert' class='assignment-due'></ha-icon>` : html`<ha-icon icon='mdi:calendar-alert' ></ha-icon>`}<span class="assignment-style">&ensp;Due On: </span>${new Date(Date.parse(this.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })}</mwc-list-item>
               <mwc-list-item><ha-icon icon="mdi:comment-text"></ha-icon><span class="assignment-style">&ensp;Comments: </span>${this.comments}</mwc-list-item>
             </mwc-list>
           </div>
