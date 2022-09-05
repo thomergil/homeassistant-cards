@@ -93,17 +93,17 @@ class InfiniteCampusStudent extends LitElement {
                     <span>${course.coursename}</span>
                     <mwc-list class="mdc-list--dense">
                     ${this.assignments.map(assignment =>
-                    html
-                    `
-                    ${assignment.personid == student.personid && assignment.coursename == course.coursename ? html
-                        `
-                        <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment)}">
-                            <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
-                            ${new Date(Date.parse(assignment.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
-                        </mwc-list-item>
-                        `
-                    :""}
-                    `
+                      html
+                      `
+                      ${assignment.personid == student.personid && assignment.coursename == course.coursename ? html
+                          `
+                          <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment)}">
+                              <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
+                              ${new Date(Date.parse(assignment.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
+                          </mwc-list-item>
+                          `
+                      :""}
+                      `
                     )}
                     `
                   :""}
