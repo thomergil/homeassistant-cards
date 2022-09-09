@@ -1,5 +1,6 @@
 import { LitElement, html } from "https://unpkg.com/lit?module";
 import { classMap } from "https://unpkg.com/lit-html@2.3.1/directives/class-map.js?module"
+import { unsafeHTML } from 'https://unpkg.com/lit-html@latest/directives/unsafe-html.js?module';
 
 // Configure the preview in the Lovelace card picker
 window.customCards = window.customCards || [];
@@ -28,31 +29,31 @@ class CanvasStudent extends LitElement {
       var configStudents = this.config.entities.find(a => a.entity == "sensor.canvas_students")
       var configCourses = this.config.entities.find(a => a.entity == "sensor.canvas_courses")
       var configAssignments = this.config.entities.find(a => a.entity == "sensor.canvas_assignments")
+      var configSubmissions = this.config.entities.find(a => a.entity == "sensor.canvas_submissions")
       
       var eStudents = configStudents.entity in this._hass.states ? this._hass.states[configStudents.entity] : null
       var eCourses = configCourses.entity in this._hass.states ? this._hass.states[configCourses.entity] : null
       var eAssignments = configAssignments.entity in this._hass.states ? this._hass.states[configAssignments.entity] : null
+      var eSubmissions = configSubmissions.entity in this._hass.states ? this._hass.states[configSubmissions.entity] : null
 
-      eAssignments.attributes.assignments.forEach(assignment => {
-        //console.warn(assignment.name + ": due: " + assignment.due_at + ": has_submission: " + assignment.has_submitted_submissions + ": submission: " + assignment.submission)
-        if (!assignment.has_submitted_submissions && assignment.due_at) {
+      eAssignments.attributes.assignment.forEach(assignment => {
+        if ((!assignment.has_submitted_submissions || eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted")) && assignment.due_at) {
+          assignment.missing = eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted" &&s.missing ) ? true : false
           this.courseAssignments.push(assignment.course_id)
           this.assignments.push(assignment)
         }
       })
 
-      eCourses.attributes.courses.forEach(course => {
+      eCourses.attributes.course.forEach(course => {
         if (!this.courses.some(c => c.name == course.name) && this.courseAssignments.some(ca => ca == course.id) && (Date.parse(course.term.start_at) <= this.date && Date.parse(course.term.end_at) >= this.date)) {
           this.courses.push(course)
         }
       })
       
-      eStudents.attributes.students.forEach(student => {
+      eStudents.attributes.student.forEach(student => {
         this.students.push(student)
       })
     }
-    //console.warn(this.assignments)
-    //this.courses.map(course => console.warn(course.name))
   }
 
   constructor(){
@@ -61,13 +62,13 @@ class CanvasStudent extends LitElement {
       console.log(e)
       const modal = this.shadowRoot.querySelector('canvas-assignment-dialog');
       modal.open = true;
-      modal.title = e.detail.e.coursename;
-      modal.assignmentname = e.detail.e.name;
-      modal.totalpoints = e.detail.e.points_possible;
-      modal.comments = e.detail.e.description;
-      modal.assigneddate = e.detail.e.created_at;
-      modal.duedate = e.detail.e.due_at;
-      modal.missing = e.detail.e.missing == true ? e.detail.e.missing : false;
+      modal.title = e.detail.course.name;
+      modal.assignmentname = e.detail.assignment.name;
+      modal.totalpoints = e.detail.assignment.points_possible;
+      modal.comments = e.detail.assignment.description;
+      modal.assigneddate = e.detail.assignment.created_at;
+      modal.duedate = e.detail.assignment.due_at;
+      modal.missing = e.detail.assignment.missing == true ? e.detail.assignment.missing : false;
       modal.date = new Date().toLocaleDateString('en-CA');
     })
   }
@@ -100,8 +101,8 @@ class CanvasStudent extends LitElement {
                       ${assignment.course_id == course.id ? html
                         `
                         <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment,course)}">
-                          <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.due_at)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.name} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
-                          ${new Date(Date.parse(assignment.due_at)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
+                          ${new Date(Date.parse(assignment.due_at)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.name.substring(0,50)} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:""}
+                          ${new Date(Date.parse(assignment.due_at)).toLocaleDateString('en-CA') <= this.date.toLocaleDateString('en-CA') && !assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
                         </mwc-list-item>
                         `
                       :""}
@@ -175,14 +176,15 @@ class CanvasStudent extends LitElement {
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
-        {entity:'sensor.canvas_assignments'}
+        {entity:'sensor.canvas_assignments'},
+        {entity:'sensor.canvas_submissions'}
       ] 
     }
   }
 
 
-  _handleClick(e,assignment,course) {
-    this.dispatchEvent(new CustomEvent('canvas-check-homework', {detail: {e}}));
+  _handleClick(assignment,course) {
+    this.dispatchEvent(new CustomEvent('canvas-check-homework', {detail: {assignment,course}}));
   }
 
 }
@@ -283,12 +285,18 @@ class AssignmentDialog extends LitElement{
           <div id="content" class="content">
             <mwc-list class="mdc-list--dense">
               <mwc-list-item>${this.assignmentname}</mwc-list-item>
-              ${this.missing ? "<mwc-list-item style='color:#a3262c;'><ha-icon icon='mdi:alert-box'></ha-icon>MISSING</mwc-list-item>" : ""}
+              ${this.missing ? html`<mwc-list-item style='color:#a3262c;'><ha-icon icon='mdi:alert-box'></ha-icon>&ensp;MISSING</mwc-list-item>` : ""}
               <mwc-list-item><ha-icon icon="mdi:counter"></ha-icon><span class="assignment-style">&ensp;Points: </span>${this.totalpoints}</mwc-list-item>
               <mwc-list-item><ha-icon icon="mdi:calendar"></ha-icon><span class="assignment-style">&ensp;Assigned On: </span>${new Date(Date.parse(this.assigneddate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })}</mwc-list-item>
               <mwc-list-item>${new Date(Date.parse(this.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<ha-icon icon='mdi:calendar-alert' class='assignment-due'></ha-icon>` : html`<ha-icon icon='mdi:calendar-alert' ></ha-icon>`}<span class="assignment-style">&ensp;Due On: </span>${new Date(Date.parse(this.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })}</mwc-list-item>
-              <mwc-list-item><ha-icon icon="mdi:comment-text"></ha-icon><span class="assignment-style">&ensp;Comments: </span>${this.comments}</mwc-list-item>
+              <!--<mwc-list-item><ha-icon icon="mdi:comment-text"></ha-icon><span class="assignment-style">&ensp;Comments: </span>${unsafeHTML(this.comments)}</mwc-list-item>-->
             </mwc-list>
+            ${this.comments ? html `
+              <div id="canvas-comments">
+                <h2>Description</h2>
+              ${unsafeHTML(this.comments)}
+            </div>
+            ` : ""}
           </div>
           <button @click=${this.handleClick}>${this.clickAction}Close</button>
         </div>

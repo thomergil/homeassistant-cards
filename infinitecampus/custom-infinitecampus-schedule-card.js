@@ -41,13 +41,13 @@ class InfiniteCampusStudent extends LitElement {
       var eCourses = configCourses.entity in this._hass.states ? this._hass.states[configCourses.entity] : null
       var eTerms = configTerms.entity in this._hass.states ? this._hass.states[configTerms.entity] : null
 
-      this.term = eTerms.attributes.terms.find(t => (this.date >= t.startdate && this.date <= t.enddate)).id
+      this.term = eTerms.attributes.term.find(t => (this.date >= t.startdate && this.date <= t.enddate)).id
 
-      eStudents.attributes.students.forEach(student => {
+      eStudents.attributes.student.forEach(student => {
         this.students.push(student)
       })
 
-      eCourses.attributes.courses.forEach(course => {
+      eCourses.attributes.course.forEach(course => {
         this.students.forEach(student => {
           var todayScheduleID = student.scheduledays.length > 0 ? student.scheduledays.find(d => d.date == this.date) : ""
           var tomorrowScheduleID = student.scheduledays.length > 0 ? student.scheduledays.find(d => d.date == this.tomorrow) : ""
@@ -66,7 +66,8 @@ class InfiniteCampusStudent extends LitElement {
             if (tomorrowScheduleID) {
               if(section.periodscheduleid == tomorrowScheduleID.periodscheduleid 
                   && !this.coursesTomorrow.find(c => c.courseid == section.courseid)
-                  && section.termid == this.term) {
+                  && section.termid == this.term
+                  && section.starttime) {
                 section.personid = student.personid
                 this.coursesTomorrow.push(section)
               }
@@ -75,6 +76,7 @@ class InfiniteCampusStudent extends LitElement {
         })
       })
     }
+
     this.coursesToday.sort((a, b) => a.starttime.localeCompare(b.starttime))
     this.coursesTomorrow.sort((a, b) => a.starttime.localeCompare(b.starttime))
   }

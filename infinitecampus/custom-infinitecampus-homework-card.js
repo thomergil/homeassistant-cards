@@ -4,8 +4,8 @@ import { classMap } from "https://unpkg.com/lit-html@2.3.1/directives/class-map.
 // Configure the preview in the Lovelace card picker
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'infinite-campus-test-hw',
-  name: 'Infinite Campus - Test HW Card',
+  type: 'infinite-campus-homework',
+  name: 'Infinite Campus - Homework Card',
   preview: false,
   description: 'A card used to display Infinite Campus Homework.',
 });
@@ -33,21 +33,21 @@ class InfiniteCampusStudent extends LitElement {
       var eCourses = configCourses.entity in this._hass.states ? this._hass.states[configCourses.entity] : null
       var eAssignments = configAssignments.entity in this._hass.states ? this._hass.states[configAssignments.entity] : null
 
-      eAssignments.attributes.assignments.forEach(assignment => {
+      eAssignments.attributes.assignment.forEach(assignment => {
         if ((Date.parse(assignment.duedate) >= Date.parse(this.date) || (assignment.missing)) && !assignment.scorepoints) {
           this.courseAssignments.push(assignment.coursename)
           this.assignments.push(assignment)
         }
       })
 
-      eCourses.attributes.courses.forEach(course => {
+      eCourses.attributes.course.forEach(course => {
         //console.warn(course)
         if (!this.courses.some(c => c.coursename == course.coursename) && this.courseAssignments.some(ca => ca == course.coursename)) {
           this.courses.push(course)
         }
       })
 
-      eStudents.attributes.students.forEach(student => {
+      eStudents.attributes.student.forEach(student => {
         this.students.push(student)
       })
     }
@@ -93,17 +93,17 @@ class InfiniteCampusStudent extends LitElement {
                     <span>${course.coursename}</span>
                     <mwc-list class="mdc-list--dense">
                     ${this.assignments.map(assignment =>
-                      html
-                      `
-                      ${assignment.personid == student.personid && assignment.coursename == course.coursename ? html
-                          `
-                          <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment)}">
-                              <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
-                              ${new Date(Date.parse(assignment.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
-                          </mwc-list-item>
-                          `
-                      :""}
-                      `
+                    html
+                    `
+                    ${assignment.personid == student.personid && assignment.coursename == course.coursename ? html
+                        `
+                        <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment)}">
+                            <span ${assignment.missing ? "class='missing'" : ""}>${new Date(Date.parse(assignment.duedate)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.assignmentname} ${assignment.missing ? "<span class='missing'>missing</span>" : ""}</span>
+                            ${new Date(Date.parse(assignment.duedate)).toLocaleDateString('en-CA') <= this.date ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
+                        </mwc-list-item>
+                        `
+                    :""}
+                    `
                     )}
                     `
                   :""}
@@ -304,4 +304,4 @@ class AssignmentDialog extends LitElement{
 }
 
 customElements.define('assignment-dialog', AssignmentDialog);
-customElements.define('infinite-campus-test-hw', InfiniteCampusStudent);
+customElements.define('infinite-campus-homework', InfiniteCampusStudent);
