@@ -1,5 +1,4 @@
 import { LitElement, html } from "https://unpkg.com/lit?module";
-//import { mdiCalendar } from "https://unpkg.com/@mdi/js@7.0.96/commonjs/mdi.js";
 
 // Configure the preview in the Lovelace card picker
 window.customCards = window.customCards || [];
