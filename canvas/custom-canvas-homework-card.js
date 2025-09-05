@@ -183,11 +183,11 @@ class CanvasStudent extends LitElement {
     if (!config.entities) {
       throw new Error('You need to define entities');
     }
-    // Set default title if not provided
-    if (!config.title) {
-      config.title = 'Canvas - Homework';
-    }
-    this.config = config;
+    // Create a new config object with defaults
+    this.config = {
+      title: 'Canvas - Homework',
+      ...config
+    };
   }
 
   // The height of your card. Home Assistant uses this to automatically
