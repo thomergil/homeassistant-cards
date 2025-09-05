@@ -44,11 +44,22 @@ class CanvasStudent extends LitElement {
         }
       })
 
+      // Sort assignments by due date
+      this.assignments.sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
+
       eCourses.attributes.course.forEach(course => {
         if (!this.courses.some(c => c.name == course.name) && this.courseAssignments.some(ca => ca == course.id) && (Date.parse(course.term.start_at) <= this.date && Date.parse(course.term.end_at) >= this.date)) {
+          // Find the earliest assignment due date for this course
+          const courseAssignments = this.assignments.filter(a => a.course_id === course.id)
+          if (courseAssignments.length > 0) {
+            course.earliestDueDate = Math.min(...courseAssignments.map(a => new Date(a.due_at)))
+          }
           this.courses.push(course)
         }
       })
+      
+      // Sort courses by earliest assignment due date
+      this.courses.sort((a, b) => (a.earliestDueDate || Infinity) - (b.earliestDueDate || Infinity))
       
       eStudents.attributes.student.forEach(student => {
         this.students.push(student)
@@ -100,9 +111,8 @@ class CanvasStudent extends LitElement {
                       `
                       ${assignment.course_id == course.id ? html
                         `
-                        <mwc-list-item class="mwc-compact" hasmeta @click="${() => this._handleClick(assignment,course)}">
-                          ${new Date(Date.parse(assignment.due_at)).toLocaleString('en-US', {month: 'numeric', day:'numeric' })} - ${assignment.name.substring(0,50)} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:""}
-                          ${new Date(Date.parse(assignment.due_at)).toLocaleDateString('en-CA') <= this.date.toLocaleDateString('en-CA') && !assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>` : ""}
+                        <mwc-list-item class="mwc-compact ${this._getDueDateClass(assignment.due_at)}" hasmeta @click="${() => this._handleClick(assignment,course)}">
+                          ${this._formatDueDate(assignment.due_at)} - ${assignment.name.substring(0,50)} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:this._getDueDateIcon(assignment.due_at)}
                         </mwc-list-item>
                         `
                       :""}
@@ -148,6 +158,17 @@ class CanvasStudent extends LitElement {
     .mwc-compact{
       height: 24px !important
     }
+    .overdue {
+      color: #a3262c !important;
+      font-weight: bold;
+    }
+    .today {
+      color: #F1D019 !important;
+      font-weight: bold;
+    }
+    .tomorrow {
+      color: #F1D019 !important;
+    }
   </style>
     `;
   }
@@ -185,6 +206,79 @@ class CanvasStudent extends LitElement {
 
   _handleClick(assignment,course) {
     this.dispatchEvent(new CustomEvent('canvas-check-homework', {detail: {assignment,course}}));
+  }
+
+  _formatDueDate(dueAt) {
+    const dueDate = new Date(Date.parse(dueAt));
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    // Reset time for comparison
+    const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+    
+    if (dueDateOnly.getTime() === todayOnly.getTime()) {
+      return `TODAY ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
+    } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
+      return `TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
+    } else if (dueDateOnly < todayOnly) {
+      return `OVERDUE ${dueDate.toLocaleDateString('en-US', {month: 'numeric', day: 'numeric'})}`;
+    } else {
+      const daysDiff = Math.ceil((dueDateOnly - todayOnly) / (1000 * 60 * 60 * 24));
+      if (daysDiff <= 7) {
+        return `${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
+      } else {
+        return dueDate.toLocaleDateString('en-US', {month: 'numeric', day: 'numeric'});
+      }
+    }
+  }
+
+  _getDueDateIcon(dueAt) {
+    const dueDate = new Date(Date.parse(dueAt));
+    const today = new Date();
+    const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    if (dueDateOnly < todayOnly) {
+      return html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#a3262c'></ha-icon></span>`;
+    } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
+      return html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>`;
+    } else {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+      
+      if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
+        return html`<span slot='meta'><ha-icon icon='mdi:calendar-clock' style='color:#F1D019'></ha-icon></span>`;
+      } else {
+        return html`<span slot='meta'><ha-icon icon='mdi:calendar' style='color:#3D95EC'></ha-icon></span>`;
+      }
+    }
+  }
+
+  _getDueDateClass(dueAt) {
+    const dueDate = new Date(Date.parse(dueAt));
+    const today = new Date();
+    const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    if (dueDateOnly < todayOnly) {
+      return 'overdue';
+    } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
+      return 'today';
+    } else {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+      
+      if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
+        return 'tomorrow';
+      } else {
+        return '';
+      }
+    }
   }
 
 }
