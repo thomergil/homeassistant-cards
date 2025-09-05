@@ -190,7 +190,6 @@ class CanvasStudent extends LitElement {
     }
     .overdue {
       color: #a3262c !important;
-      font-weight: bold;
     }
     .today {
       color: #F1D019 !important;
@@ -262,7 +261,7 @@ class CanvasStudent extends LitElement {
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
       return `TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly < todayOnly) {
-      return `OVERDUE ${dueDate.toLocaleDateString('en-US', {month: 'numeric', day: 'numeric'})}`;
+      return `❗ ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
       const daysDiff = Math.ceil((dueDateOnly - todayOnly) / (1000 * 60 * 60 * 24));
       if (daysDiff <= 7) {
