@@ -161,10 +161,16 @@ class CanvasStudent extends LitElement {
     .missing {
       color: #a3262c;
     }
+    mwc-list {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
     .mwc-compact{
       height: 24px !important;
       white-space: nowrap;
       overflow: visible;
+      padding-left: 0 !important;
+      margin-left: 0 !important;
     }
     .assignment-content {
       display: flex;
