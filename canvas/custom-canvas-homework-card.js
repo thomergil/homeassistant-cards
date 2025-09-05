@@ -12,6 +12,10 @@ window.customCards.push({
 });
 
 class CanvasStudent extends LitElement {
+  static get MAX_ASSIGNMENT_NAME_LENGTH() {
+    return 45;
+  }
+
   // Whenever the state changes, a new `hass` object is set. Use this to
   // update your content.
   set hass(hass) {
@@ -112,7 +116,7 @@ class CanvasStudent extends LitElement {
                       ${assignment.course_id == course.id ? html
                         `
                         <mwc-list-item class="mwc-compact ${this._getDueDateClass(assignment.due_at)}" hasmeta @click="${() => this._handleClick(assignment,course)}">
-                          ${this._formatDueDate(assignment.due_at)} - ${assignment.name.substring(0,50)} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:this._getDueDateIcon(assignment.due_at)}
+                          ${this._formatDueDate(assignment.due_at)} - ${this._truncateText(assignment.name, CanvasStudent.MAX_ASSIGNMENT_NAME_LENGTH)} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:this._getDueDateIcon(assignment.due_at)}
                         </mwc-list-item>
                         `
                       :""}
@@ -279,6 +283,12 @@ class CanvasStudent extends LitElement {
         return '';
       }
     }
+  }
+
+  _truncateText(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
   }
 
 }
