@@ -13,7 +13,7 @@ window.customCards.push({
 
 class CanvasStudent extends LitElement {
   static get MAX_ASSIGNMENT_NAME_LENGTH() {
-    return 45;
+    return 38;
   }
 
   // Whenever the state changes, a new `hass` object is set. Use this to
