@@ -170,7 +170,7 @@ class CanvasStudent extends LitElement {
     .assignment-content {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 16px;
     }
     .assignment-content ha-icon {
       flex-shrink: 0;
