@@ -163,15 +163,14 @@ class CanvasStudent extends LitElement {
       height: 24px !important;
       white-space: nowrap;
       overflow: visible;
-    }
-    mwc-list-item {
-      --mdc-list-item-meta-size: auto !important;
-      --mdc-list-item-meta-margin: 0 0 0 auto !important;
+      position: relative;
+      padding-right: 40px !important;
     }
     mwc-list-item [slot='meta'] {
-      margin-left: auto !important;
       position: absolute !important;
-      right: 16px !important;
+      right: 8px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
     }
     .overdue {
       color: #a3262c !important;
