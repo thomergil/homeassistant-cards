@@ -94,7 +94,7 @@ class CanvasStudent extends LitElement {
     ${this._renderStyle()}
     ${html
       `
-      <ha-card header="${this.config.title || 'Canvas - Homework'}">
+      <ha-card ${this.config.title ? `header="${this.config.title}"` : ''}>
         <div class="card-content">
         ${this.students.map(student =>
           html
@@ -183,11 +183,14 @@ class CanvasStudent extends LitElement {
     if (!config.entities) {
       throw new Error('You need to define entities');
     }
-    // Create a new config object with defaults
+    // Create a new config object - don't force a default title
     this.config = {
-      title: 'Canvas - Homework',
       ...config
     };
+    // Set default title only if none provided and not explicitly empty
+    if (this.config.title === undefined) {
+      this.config.title = 'Canvas - Homework';
+    }
   }
 
   // The height of your card. Home Assistant uses this to automatically
