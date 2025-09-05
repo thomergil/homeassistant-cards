@@ -145,14 +145,26 @@ class CanvasStudent extends LitElement {
     <style>
     ha-card {
       width: 100%;
-      max-width: none;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .card-content {
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
     .info {
       padding-bottom: 1em;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
     .flex {
       display: flex;
       justify-content: space-between;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
     .student_name {
       margin-bottom: 12px;
@@ -172,13 +184,18 @@ class CanvasStudent extends LitElement {
     mwc-list {
       padding: 0 !important;
       margin: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
     .mwc-compact{
       height: 24px !important;
       white-space: nowrap;
-      overflow: visible;
+      overflow: hidden !important;
       padding-left: 0 !important;
       margin-left: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     .assignment-content {
       display: flex;
