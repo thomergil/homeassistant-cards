@@ -157,7 +157,6 @@ class CanvasStudent extends LitElement {
     .secondary {
       display: block;
       color: #3D95EC;
-      margin-left: 28px;
     }
     .missing {
       color: #a3262c;
