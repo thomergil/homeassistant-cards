@@ -162,6 +162,9 @@ class CanvasStudent extends LitElement {
       display: block;
       color: #3D95EC;
       font-size: 1.1em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .missing {
       color: #a3262c;
@@ -189,6 +192,9 @@ class CanvasStudent extends LitElement {
     }
     .assignment-text {
       flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .missing-icon {
       color: #a3262c !important;
