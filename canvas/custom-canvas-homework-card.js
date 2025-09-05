@@ -111,8 +111,11 @@ class CanvasStudent extends LitElement {
                       `
                       ${assignment.course_id == course.id ? html
                         `
-                        <mwc-list-item class="mwc-compact ${this._getDueDateClass(assignment.due_at)}" hasmeta @click="${() => this._handleClick(assignment,course)}">
-                          ${this._formatDueDate(assignment.due_at)} - ${assignment.name} ${assignment.missing ? html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' class='missing'></ha-icon></span>`:this._getDueDateIcon(assignment.due_at)}
+                        <mwc-list-item class="mwc-compact ${this._getDueDateClass(assignment.due_at)}" @click="${() => this._handleClick(assignment,course)}">
+                          <span class="assignment-content">
+                            ${assignment.missing ? html`<ha-icon icon='mdi:calendar-alert' class='missing-icon'></ha-icon>`:this._getDueDateIcon(assignment.due_at)}
+                            <span class="assignment-text">${this._formatDueDate(assignment.due_at)} - ${assignment.name}</span>
+                          </span>
                         </mwc-list-item>
                         `
                       :""}
@@ -163,14 +166,22 @@ class CanvasStudent extends LitElement {
       height: 24px !important;
       white-space: nowrap;
       overflow: visible;
-      position: relative;
-      padding-right: 40px !important;
     }
-    mwc-list-item [slot='meta'] {
-      position: absolute !important;
-      right: 8px !important;
-      top: 50% !important;
-      transform: translateY(-50%) !important;
+    .assignment-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .assignment-content ha-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+    .assignment-text {
+      flex: 1;
+    }
+    .missing-icon {
+      color: #a3262c !important;
     }
     .overdue {
       color: #a3262c !important;
@@ -262,20 +273,20 @@ class CanvasStudent extends LitElement {
     const today = new Date();
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
+    
     if (dueDateOnly < todayOnly) {
-      return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon></span>`;
+      return html`<ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon></span>`;
+      return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
     } else {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-
+      
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-        return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon></span>`;
+        return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
       } else {
-        return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#3D95EC'></ha-icon></span>`;
+        return html`<ha-icon icon='mdi:magnify' style='color:#3D95EC'></ha-icon>`;
       }
     }
   }
