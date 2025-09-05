@@ -154,9 +154,14 @@ class CanvasStudent extends LitElement {
       display: flex;
       justify-content: space-between;
     }
+    .student_name {
+      margin-bottom: 12px;
+      display: block;
+    }
     .secondary {
       display: block;
       color: #3D95EC;
+      font-size: 1.1em;
     }
     .missing {
       color: #a3262c;
@@ -290,7 +295,7 @@ class CanvasStudent extends LitElement {
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
         return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
       } else {
-        return html`<ha-icon icon='mdi:magnify' style='color:#3D95EC'></ha-icon>`;
+        return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
       }
     }
   }
