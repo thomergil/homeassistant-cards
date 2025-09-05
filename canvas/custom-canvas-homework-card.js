@@ -263,7 +263,7 @@ class CanvasStudent extends LitElement {
       if (daysDiff <= 7) {
         return `${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
       } else {
-        return dueDate.toLocaleDateString('en-US', {month: 'numeric', day: 'numeric'});
+        return dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'});
       }
     }
   }
