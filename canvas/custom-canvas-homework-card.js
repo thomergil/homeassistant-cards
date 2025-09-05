@@ -30,7 +30,7 @@ class CanvasStudent extends LitElement {
       var configCourses = this.config.entities.find(a => a.entity == "sensor.canvas_courses")
       var configAssignments = this.config.entities.find(a => a.entity == "sensor.canvas_assignments")
       var configSubmissions = this.config.entities.find(a => a.entity == "sensor.canvas_submissions")
-      
+
       var eStudents = configStudents.entity in this._hass.states ? this._hass.states[configStudents.entity] : null
       var eCourses = configCourses.entity in this._hass.states ? this._hass.states[configCourses.entity] : null
       var eAssignments = configAssignments.entity in this._hass.states ? this._hass.states[configAssignments.entity] : null
@@ -57,10 +57,10 @@ class CanvasStudent extends LitElement {
           this.courses.push(course)
         }
       })
-      
+
       // Sort courses by earliest assignment due date
       this.courses.sort((a, b) => (a.earliestDueDate || Infinity) - (b.earliestDueDate || Infinity))
-      
+
       eStudents.attributes.student.forEach(student => {
         this.students.push(student)
       })
@@ -92,7 +92,7 @@ class CanvasStudent extends LitElement {
       `
       <ha-card header="Canvas - Homework">
         <div class="card-content">
-        ${this.students.map(student => 
+        ${this.students.map(student =>
           html
           `
             <div class="info flex">
@@ -193,13 +193,13 @@ class CanvasStudent extends LitElement {
   }
 
   static getStubConfig() {
-    return { 
+    return {
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
         {entity:'sensor.canvas_assignments'},
         {entity:'sensor.canvas_submissions'}
-      ] 
+      ]
     }
   }
 
@@ -213,12 +213,12 @@ class CanvasStudent extends LitElement {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    
+
     // Reset time for comparison
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-    
+
     if (dueDateOnly.getTime() === todayOnly.getTime()) {
       return `TODAY ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
@@ -240,7 +240,7 @@ class CanvasStudent extends LitElement {
     const today = new Date();
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     if (dueDateOnly < todayOnly) {
       return html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#a3262c'></ha-icon></span>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
@@ -249,7 +249,7 @@ class CanvasStudent extends LitElement {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-      
+
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
         return html`<span slot='meta'><ha-icon icon='mdi:calendar-clock' style='color:#F1D019'></ha-icon></span>`;
       } else {
@@ -263,7 +263,7 @@ class CanvasStudent extends LitElement {
     const today = new Date();
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     if (dueDateOnly < todayOnly) {
       return 'overdue';
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
@@ -272,7 +272,7 @@ class CanvasStudent extends LitElement {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-      
+
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
         return 'tomorrow';
       } else {
