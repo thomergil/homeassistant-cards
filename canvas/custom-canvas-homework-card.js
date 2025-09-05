@@ -163,6 +163,14 @@ class CanvasStudent extends LitElement {
       height: 24px !important;
       white-space: nowrap;
       overflow: visible;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mwc-compact [slot='meta'] {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
     }
     .overdue {
       color: #a3262c !important;
@@ -256,18 +264,18 @@ class CanvasStudent extends LitElement {
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     if (dueDateOnly < todayOnly) {
-      return html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#a3262c'></ha-icon></span>`;
+      return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon></span>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return html`<span slot='meta'><ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon></span>`;
+      return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon></span>`;
     } else {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
 
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-        return html`<span slot='meta'><ha-icon icon='mdi:calendar-clock' style='color:#F1D019'></ha-icon></span>`;
+        return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon></span>`;
       } else {
-        return html`<span slot='meta'><ha-icon icon='mdi:calendar' style='color:#3D95EC'></ha-icon></span>`;
+        return html`<span slot='meta'><ha-icon icon='mdi:magnify' style='color:#3D95EC'></ha-icon></span>`;
       }
     }
   }
