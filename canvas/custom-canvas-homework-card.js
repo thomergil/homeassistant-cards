@@ -94,7 +94,7 @@ class CanvasStudent extends LitElement {
     ${this._renderStyle()}
     ${html
       `
-      <ha-card header="Canvas - Homework">
+      <ha-card header="${this.config.title || 'Canvas - Homework'}">
         <div class="card-content">
         ${this.students.map(student =>
           html
@@ -183,6 +183,10 @@ class CanvasStudent extends LitElement {
     if (!config.entities) {
       throw new Error('You need to define entities');
     }
+    // Set default title if not provided
+    if (!config.title) {
+      config.title = 'Canvas - Homework';
+    }
     this.config = config;
   }
 
@@ -193,11 +197,12 @@ class CanvasStudent extends LitElement {
   }
 
   static getConfigElement() {
-    return document.createElement("content-card-editor");
+    return document.createElement("canvas-card-editor");
   }
 
   static getStubConfig() {
     return {
+      title: "Canvas - Homework",
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
@@ -418,5 +423,63 @@ class AssignmentDialog extends LitElement{
   }
 }
 
+class CanvasCardEditor extends LitElement {
+  static get properties() {
+    return {
+      hass: {},
+      config: {}
+    };
+  }
+
+  setConfig(config) {
+    this.config = config;
+  }
+
+  render() {
+    if (!this.hass || !this.config) {
+      return html``;
+    }
+
+    return html`
+      <div class="card-config">
+        <div class="option">
+          <ha-textfield
+            label="Title"
+            .value=${this.config.title || 'Canvas - Homework'}
+            .configValue=${'title'}
+            @input=${this._valueChanged}
+          ></ha-textfield>
+        </div>
+      </div>
+    `;
+  }
+
+  _valueChanged(ev) {
+    if (!this.config || !this.hass) {
+      return;
+    }
+    const target = ev.target;
+    const configValue = target.configValue;
+    const value = target.value;
+
+    if (this.config[configValue] === value) {
+      return;
+    }
+
+    const newConfig = {
+      ...this.config,
+      [configValue]: value
+    };
+
+    const event = new CustomEvent('config-changed', {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
+  }
+}
+
 customElements.define('canvas-assignment-dialog', AssignmentDialog);
+customElements.define('canvas-card-editor', CanvasCardEditor);
 customElements.define('canvas-homework', CanvasStudent);
