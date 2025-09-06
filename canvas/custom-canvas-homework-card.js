@@ -214,6 +214,7 @@ class CanvasStudent extends LitElement {
       overflow: hidden !important;
       padding-left: 0 !important;
       margin-left: 0 !important;
+      margin-top: -8px !important;
       width: 100% !important;
       box-sizing: border-box !important;
     }
