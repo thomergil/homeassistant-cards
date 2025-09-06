@@ -414,8 +414,11 @@ class AssignmentDialog extends LitElement{
         background: var( --ha-card-background, var(--card-background-color, white) );
         border-radius: 2px;
         max-width: 600px;
+        max-height: 80vh;
         padding: 1rem;
         position: absolute;
+        overflow-y: auto;
+        box-sizing: border-box;
       }
       .dialog h1 {
         margin: 0 0 10px;
