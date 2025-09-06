@@ -301,7 +301,7 @@ class CanvasStudent extends LitElement {
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
       return `TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly < todayOnly) {
-      return `<span style="color:#ff6b6b">❗</span> ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
+      return html`<span style="color:#ff6b6b">❗</span> ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
       const daysDiff = Math.ceil((dueDateOnly - todayOnly) / (1000 * 60 * 60 * 24));
       if (daysDiff <= this.lookAheadDays) {
