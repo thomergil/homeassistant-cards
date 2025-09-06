@@ -1,6 +1,6 @@
 # Home Assistant Canvas Cards
 
-Canvas homework display cards for Home Assistant, based on [schwartzpub's original card](https://github.com/schwartzpub) with enhancements including smart sorting, visual indicators, and configurable titles.
+Canvas homework display cards for Home Assistant, based on [schwartzpub's original card](https://github.com/schwartzpub) with enhancements including smart sorting, visual indicators, configurable titles, and adjustable look-ahead periods.
 
 ## Installation
 
@@ -39,6 +39,7 @@ git clone https://github.com/thomergil/homeassistant-cards.git
 ```yaml
 type: custom:canvas-homework
 title: "My Student's Homework" # Optional, customizable
+look_ahead_days: 5 # Optional, defaults to 5 days
 entities:
   - entity: sensor.canvas_students
   - entity: sensor.canvas_courses
