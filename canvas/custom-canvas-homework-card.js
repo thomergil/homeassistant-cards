@@ -225,10 +225,10 @@ class CanvasStudent extends LitElement {
       white-space: nowrap;
     }
     .missing-icon {
-      color: #a3262c !important;
+      color: #ff6b6b !important;
     }
     .overdue {
-      color: #a3262c !important;
+      color: white !important;
     }
     .today {
       color: #F1D019 !important;
@@ -301,7 +301,7 @@ class CanvasStudent extends LitElement {
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
       return `TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly < todayOnly) {
-      return `❗ ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
+      return `<span style="color:#ff6b6b">❗</span> ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
       const daysDiff = Math.ceil((dueDateOnly - todayOnly) / (1000 * 60 * 60 * 24));
       if (daysDiff <= this.lookAheadDays) {
@@ -319,7 +319,7 @@ class CanvasStudent extends LitElement {
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
     if (dueDateOnly < todayOnly) {
-      return html`<ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon>`;
+      return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
       return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
     } else {
