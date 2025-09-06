@@ -191,8 +191,8 @@ class CanvasStudent extends LitElement {
     }
     .course-header {
       display: block;
-      margin-top: 16px;
-      margin-bottom: 6px;
+      margin-top: 12px;
+      margin-bottom: 2px;
     }
     .missing {
       color: #a3262c;
