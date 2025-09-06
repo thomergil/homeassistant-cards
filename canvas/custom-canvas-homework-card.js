@@ -124,7 +124,7 @@ class CanvasStudent extends LitElement {
                         `
                         <mwc-list-item class="mwc-compact ${this._getDueDateClass(assignment.due_at)}" @click="${() => this._handleClick(assignment,course)}">
                           <span class="assignment-content">
-                            ${assignment.missing ? html`<ha-icon icon='mdi:calendar-alert' class='missing-icon'></ha-icon>`:this._getDueDateIcon(assignment.due_at)}
+                            ${assignment.missing ? html`<ha-icon icon='mdi:magnify' class='missing-icon'></ha-icon>`:this._getDueDateIcon(assignment.due_at)}
                             <span class="assignment-text">${this._formatDueDate(assignment.due_at)} [${assignment.points_possible || 'N/A'}] - ${assignment.name}</span>
                           </span>
                         </mwc-list-item>
