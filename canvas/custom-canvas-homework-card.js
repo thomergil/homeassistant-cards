@@ -23,6 +23,9 @@ class CanvasStudent extends LitElement {
     this.assignments = new Array();
     this.courseAssignments = new Array();
     this.date = new Date();
+    
+    // Get look-ahead days from config, default to 5
+    this.lookAheadDays = this.config.look_ahead_days || 5;
 
     if(Array.isArray(this.config.entities))
     {
@@ -36,11 +39,19 @@ class CanvasStudent extends LitElement {
       var eAssignments = configAssignments.entity in this._hass.states ? this._hass.states[configAssignments.entity] : null
       var eSubmissions = configSubmissions.entity in this._hass.states ? this._hass.states[configSubmissions.entity] : null
 
+      // Calculate look-ahead cutoff date
+      const lookAheadCutoff = new Date(this.date);
+      lookAheadCutoff.setDate(lookAheadCutoff.getDate() + this.lookAheadDays);
+
       eAssignments.attributes.assignment.forEach(assignment => {
         if ((!assignment.has_submitted_submissions || eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted")) && assignment.due_at) {
-          assignment.missing = eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted" &&s.missing ) ? true : false
-          this.courseAssignments.push(assignment.course_id)
-          this.assignments.push(assignment)
+          const dueDate = new Date(Date.parse(assignment.due_at));
+          // Only include assignments that are either missing or within the look-ahead period
+          if (assignment.missing || dueDate <= lookAheadCutoff) {
+            assignment.missing = eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted" &&s.missing ) ? true : false
+            this.courseAssignments.push(assignment.course_id)
+            this.assignments.push(assignment)
+          }
         }
       })
 
@@ -259,6 +270,7 @@ class CanvasStudent extends LitElement {
   static getStubConfig() {
     return {
       title: "Canvas - Homework",
+      look_ahead_days: 5,
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
@@ -292,7 +304,7 @@ class CanvasStudent extends LitElement {
       return `❗ ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
       const daysDiff = Math.ceil((dueDateOnly - todayOnly) / (1000 * 60 * 60 * 24));
-      if (daysDiff <= 7) {
+      if (daysDiff <= this.lookAheadDays) {
         return `${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
       } else {
         return dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'});
@@ -307,18 +319,18 @@ class CanvasStudent extends LitElement {
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     
     if (dueDateOnly < todayOnly) {
-      return html`<ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon>`;
+      return html`<ha-icon icon='mdi:calendar-alert' style='color:#a3262c'></ha-icon>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
+      return html`<ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon>`;
     } else {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
       
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-        return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
+        return html`<ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon>`;
       } else {
-        return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
+        return html`<ha-icon icon='mdi:calendar-alert' style='color:white'></ha-icon>`;
       }
     }
   }
@@ -501,6 +513,15 @@ class CanvasCardEditor extends LitElement {
             @input=${this._valueChanged}
           ></ha-textfield>
         </div>
+        <div class="option">
+          <ha-textfield
+            label="Look-ahead Days"
+            type="number"
+            .value=${this.config.look_ahead_days || 5}
+            .configValue=${'look_ahead_days'}
+            @input=${this._valueChanged}
+          ></ha-textfield>
+        </div>
       </div>
     `;
   }
@@ -511,7 +532,15 @@ class CanvasCardEditor extends LitElement {
     }
     const target = ev.target;
     const configValue = target.configValue;
-    const value = target.value;
+    let value = target.value;
+
+    // Convert numeric values
+    if (configValue === 'look_ahead_days') {
+      value = parseInt(value, 10);
+      if (isNaN(value) || value < 1) {
+        value = 5; // Default fallback
+      }
+    }
 
     if (this.config[configValue] === value) {
       return;
