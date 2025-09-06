@@ -1,5 +1,7 @@
 # Home Assistant Canvas Cards
 
+<img src="img/canvas-card.png" alt="Canvas Card" width="300">
+
 Canvas homework display cards for Home Assistant, based on [schwartzpub's original card](https://github.com/schwartzpub) with enhancements including smart sorting, visual indicators, configurable titles, and adjustable look-ahead periods.
 
 ## Installation
