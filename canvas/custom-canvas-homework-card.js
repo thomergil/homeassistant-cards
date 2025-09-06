@@ -192,7 +192,10 @@ class CanvasStudent extends LitElement {
     .course-header {
       display: block;
       margin-top: 12px;
-      margin-bottom: 2px;
+      margin-bottom: 0px;
+    }
+    .course-header + mwc-list {
+      margin-top: 0 !important;
     }
     .missing {
       color: #a3262c;
@@ -200,6 +203,7 @@ class CanvasStudent extends LitElement {
     mwc-list {
       padding: 0 !important;
       margin: 0 !important;
+      margin-top: 0 !important;
       width: 100% !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
