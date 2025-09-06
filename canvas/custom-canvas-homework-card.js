@@ -23,7 +23,7 @@ class CanvasStudent extends LitElement {
     this.assignments = new Array();
     this.courseAssignments = new Array();
     this.date = new Date();
-    
+
     // Get look-ahead days from config, default to 5
     this.lookAheadDays = this.config.look_ahead_days || 5;
 
@@ -317,20 +317,20 @@ class CanvasStudent extends LitElement {
     const today = new Date();
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     if (dueDateOnly < todayOnly) {
-      return html`<ha-icon icon='mdi:calendar-alert' style='color:#a3262c'></ha-icon>`;
+      return html`<ha-icon icon='mdi:magnify' style='color:#a3262c'></ha-icon>`;
     } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return html`<ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon>`;
+      return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
     } else {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-      
+
       if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-        return html`<ha-icon icon='mdi:calendar-alert' style='color:#F1D019'></ha-icon>`;
+        return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
       } else {
-        return html`<ha-icon icon='mdi:calendar-alert' style='color:white'></ha-icon>`;
+        return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
       }
     }
   }
