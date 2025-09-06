@@ -115,7 +115,7 @@ class CanvasStudent extends LitElement {
                   `
                   ${course.enrollments[0].user_id == student.id ? html
                     `
-                    <span>${course.name}</span>
+                    <span class="course-header">${course.name}</span>
                     <mwc-list class="mdc-list--dense">
                     ${this.assignments.map(assignment =>
                       html
@@ -188,6 +188,11 @@ class CanvasStudent extends LitElement {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .course-header {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
     }
     .missing {
       color: #a3262c;
