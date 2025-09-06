@@ -225,17 +225,17 @@ class CanvasStudent extends LitElement {
       white-space: nowrap;
     }
     .missing-icon {
-      color: #ff6b6b !important;
+      color: white !important;
     }
     .overdue {
       color: white !important;
     }
     .today {
-      color: #F1D019 !important;
+      color: white !important;
       font-weight: bold;
     }
     .tomorrow {
-      color: #F1D019 !important;
+      color: white !important;
     }
   </style>
     `;
@@ -297,9 +297,9 @@ class CanvasStudent extends LitElement {
     const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
 
     if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return `TODAY ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
+      return html`<span style="color:#F1D019">⚠️</span> TODAY ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-      return `TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
+      return html`<span style="color:#F1D019">⚠️</span> TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly < todayOnly) {
       return html`<span style="color:#ff6b6b">❗</span> ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
@@ -318,21 +318,8 @@ class CanvasStudent extends LitElement {
     const dueDateOnly = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
     const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    if (dueDateOnly < todayOnly) {
-      return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
-    } else if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
-    } else {
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
-      const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-
-      if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-        return html`<ha-icon icon='mdi:magnify' style='color:#F1D019'></ha-icon>`;
-      } else {
-        return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
-      }
-    }
+    // All magnifier icons are white - status is indicated by text symbols
+    return html`<ha-icon icon='mdi:magnify' style='color:white'></ha-icon>`;
   }
 
   _getDueDateClass(dueAt) {
