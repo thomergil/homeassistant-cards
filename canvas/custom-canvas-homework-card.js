@@ -311,7 +311,7 @@ class CanvasStudent extends LitElement {
     if (dueDateOnly.getTime() === todayOnly.getTime()) {
       return html`<span style="color:#F1D019">⚠️</span> TODAY ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-      return html`<span style="color:#F1D019">⚠️</span> TOMORROW ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
+      return html`<span style="color:#F1D019">⚠️</span> ${dueDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true})}`;
     } else if (dueDateOnly < todayOnly) {
       return html`<span style="color:#ff6b6b">❗</span> ${dueDate.toLocaleDateString('en-US', {weekday: 'short', month: 'numeric', day: 'numeric'})}`;
     } else {
