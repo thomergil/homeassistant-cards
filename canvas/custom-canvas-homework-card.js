@@ -579,7 +579,7 @@ class CanvasCardEditor extends LitElement {
             @selected=${this._valueChanged}
             @closed=${(ev) => ev.stopPropagation()}
           >
-            <mwc-list-item value="due_date">Due Date (with alphabetical tiebreaker)</mwc-list-item>
+            <mwc-list-item value="due_date">Due date</mwc-list-item>
             <mwc-list-item value="alphabetical">Alphabetical</mwc-list-item>
           </ha-select>
         </div>
