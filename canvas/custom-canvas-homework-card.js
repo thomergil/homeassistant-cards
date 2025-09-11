@@ -53,8 +53,17 @@ class CanvasStudent extends LitElement {
       eAssignments.attributes.assignment.forEach(assignment => {
         if ((!assignment.has_submitted_submissions || eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted")) && assignment.due_at) {
           const dueDate = new Date(Date.parse(assignment.due_at));
-          // Only include assignments that are either missing, within the look-ahead period, or not too old if overdue
-          if (assignment.missing || dueDate <= lookAheadCutoff || dueDate >= overdueCutoff) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
+          dueDate.setHours(0, 0, 0, 0);
+
+          // Only include assignments that are:
+          // 1. Missing (regardless of date), OR
+          // 2. Due in the future within look-ahead period, OR
+          // 3. Overdue but not older than cutoff
+          if (assignment.missing ||
+              (dueDate >= today && dueDate <= lookAheadCutoff) ||
+              (dueDate < today && dueDate >= overdueCutoff)) {
             assignment.missing = eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted" &&s.missing ) ? true : false
             this.courseAssignments.push(assignment.course_id)
             this.assignments.push(assignment)
