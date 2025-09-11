@@ -30,6 +30,9 @@ class CanvasStudent extends LitElement {
     // Get overdue cutoff days from config, default to 5
     this.overdueCutoffDays = this.config.overdue_cutoff_days || 5;
 
+    // Get course sort order from config, default to "due_date"
+    this.courseSortOrder = this.config.course_sort_order || 'due_date';
+
     if(Array.isArray(this.config.entities))
     {
       var configStudents = this.config.entities.find(a => a.entity == "sensor.canvas_students")
@@ -85,8 +88,25 @@ class CanvasStudent extends LitElement {
         }
       })
 
-      // Sort courses by earliest assignment due date
-      this.courses.sort((a, b) => (a.earliestDueDate || Infinity) - (b.earliestDueDate || Infinity))
+      // Sort courses based on configuration
+      if (this.courseSortOrder === 'alphabetical') {
+        // Sort courses alphabetically by name
+        this.courses.sort((a, b) => a.name.localeCompare(b.name));
+      } else {
+        // Sort courses by earliest due date first, then alphabetically by name
+        this.courses.sort((a, b) => {
+          const dateA = a.earliestDueDate || Infinity;
+          const dateB = b.earliestDueDate || Infinity;
+
+          // If due dates are the same, sort alphabetically
+          if (dateA === dateB) {
+            return a.name.localeCompare(b.name);
+          }
+
+          // Otherwise sort by due date (earliest first)
+          return dateA - dateB;
+        });
+      }
 
       eStudents.attributes.student.forEach(student => {
         this.students.push(student)
@@ -300,6 +320,7 @@ class CanvasStudent extends LitElement {
       title: "Canvas - Homework",
       look_ahead_days: 5,
       overdue_cutoff_days: 5,
+      course_sort_order: "due_date",
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
@@ -550,6 +571,18 @@ class CanvasCardEditor extends LitElement {
             @input=${this._valueChanged}
           ></ha-textfield>
         </div>
+        <div class="option">
+          <ha-select
+            label="Course Sort Order"
+            .value=${this.config.course_sort_order || 'due_date'}
+            .configValue=${'course_sort_order'}
+            @selected=${this._valueChanged}
+            @closed=${(ev) => ev.stopPropagation()}
+          >
+            <mwc-list-item value="due_date">Due Date (with alphabetical tiebreaker)</mwc-list-item>
+            <mwc-list-item value="alphabetical">Alphabetical</mwc-list-item>
+          </ha-select>
+        </div>
       </div>
     `;
   }
@@ -561,6 +594,14 @@ class CanvasCardEditor extends LitElement {
     const target = ev.target;
     const configValue = target.configValue;
     let value = target.value;
+
+    // Handle dropdown selection events
+    if (ev.type === 'selected') {
+      const selectedItem = target.selectedItem;
+      if (selectedItem) {
+        value = selectedItem.value;
+      }
+    }
 
     // Convert numeric values
     if (configValue === 'look_ahead_days' || configValue === 'overdue_cutoff_days') {
