@@ -27,6 +27,9 @@ class CanvasStudent extends LitElement {
     // Get look-ahead days from config, default to 5
     this.lookAheadDays = this.config.look_ahead_days || 5;
 
+    // Get overdue cutoff days from config, default to 5
+    this.overdueCutoffDays = this.config.overdue_cutoff_days || 5;
+
     if(Array.isArray(this.config.entities))
     {
       var configStudents = this.config.entities.find(a => a.entity == "sensor.canvas_students")
@@ -43,11 +46,15 @@ class CanvasStudent extends LitElement {
       const lookAheadCutoff = new Date(this.date);
       lookAheadCutoff.setDate(lookAheadCutoff.getDate() + this.lookAheadDays);
 
+      // Calculate overdue cutoff date
+      const overdueCutoff = new Date(this.date);
+      overdueCutoff.setDate(overdueCutoff.getDate() - this.overdueCutoffDays);
+
       eAssignments.attributes.assignment.forEach(assignment => {
         if ((!assignment.has_submitted_submissions || eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted")) && assignment.due_at) {
           const dueDate = new Date(Date.parse(assignment.due_at));
-          // Only include assignments that are either missing or within the look-ahead period
-          if (assignment.missing || dueDate <= lookAheadCutoff) {
+          // Only include assignments that are either missing, within the look-ahead period, or not too old if overdue
+          if (assignment.missing || dueDate <= lookAheadCutoff || dueDate >= overdueCutoff) {
             assignment.missing = eSubmissions.attributes.submission.some(s => s.assignment_id == assignment.id && s.workflow_state == "unsubmitted" &&s.missing ) ? true : false
             this.courseAssignments.push(assignment.course_id)
             this.assignments.push(assignment)
@@ -283,6 +290,7 @@ class CanvasStudent extends LitElement {
     return {
       title: "Canvas - Homework",
       look_ahead_days: 5,
+      overdue_cutoff_days: 5,
       entities: [
         {entity:'sensor.canvas_students'},
         {entity:'sensor.canvas_courses'},
@@ -524,6 +532,15 @@ class CanvasCardEditor extends LitElement {
             @input=${this._valueChanged}
           ></ha-textfield>
         </div>
+        <div class="option">
+          <ha-textfield
+            label="Overdue Cutoff Days"
+            type="number"
+            .value=${this.config.overdue_cutoff_days || 5}
+            .configValue=${'overdue_cutoff_days'}
+            @input=${this._valueChanged}
+          ></ha-textfield>
+        </div>
       </div>
     `;
   }
@@ -537,7 +554,7 @@ class CanvasCardEditor extends LitElement {
     let value = target.value;
 
     // Convert numeric values
-    if (configValue === 'look_ahead_days') {
+    if (configValue === 'look_ahead_days' || configValue === 'overdue_cutoff_days') {
       value = parseInt(value, 10);
       if (isNaN(value) || value < 1) {
         value = 5; // Default fallback
